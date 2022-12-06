@@ -18,8 +18,11 @@ for (const line of lines) {
   }
 }
 
-// Find the Elf with the most calories by finding the maximum value in the array
-const maxCalories = Math.max(...elfCalories);
+// Sort the array of Elf calories in descending order
+elfCalories.sort((a, b) => b - a);
+
+// Find the total calories carried by the top three Elves
+const topThreeCalories = elfCalories.slice(0, 3).reduce((sum, calories) => sum + calories, 0);
 
 // Print the result to the console
-console.log(`The Elf with the most calories is carrying ${maxCalories} calories.`);
+console.log(`The top three Elves are carrying ${topThreeCalories} calories in total.`);

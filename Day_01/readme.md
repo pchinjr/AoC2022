@@ -1,5 +1,5 @@
 ## Prompt
-Write and explain the solution for the following advent of code task. Write code in TypeScript and assume that any input you need to process is available in file "input.txt".
+Write and explain the solution for the following advent of code task. Write code in TypeScript that will execute in Deno, and assume that any input you need to process is available in file "input.txt".
 
 --- Day 1: Calorie Counting ---
 
@@ -30,25 +30,81 @@ The first Elf is carrying food with 1000, 2000, and 3000 Calories, a total of 60
 Find the Elf carrying the most Calories. How many total Calories is that Elf carrying?
 
 ## Answer
-Here is a solution to the problem in TypeScript:
-```TypeScript
-import { readFileSync } from 'fs';
+To solve this task, we will first read the input file and store the calories of each Elf in an array. Then, we will find the Elf with the most calories by finding the maximum value in the array. Finally, we will print the result to the console.
 
-// Read the input file and split it into lines
-const input = readFileSync('input.txt', 'utf8').split('\n');
+```typescript
+import { readFileStr } from "https://deno.land/std/fs/read_file_str.ts";
 
-// Parse the input into an array of numbers
-const calories = input.map(str => parseInt(str, 10));
+// Read the input file and split it into an array of strings
+const input = await readFileStr("input.txt");
+const lines = input.split("\n");
 
-// Filter out any NaN values from the input
-calories = calories.filter(num => !isNaN(num));
+// Create an array to store the calories of each Elf
+const elfCalories = [];
+
+// Parse the calories for each Elf from the input strings
+let currentElf = 0;
+for (const line of lines) {
+  if (line === "") {
+    // If the line is empty, we have reached the next Elf
+    currentElf++;
+  } else {
+    // Parse the calorie value from the line and add it to the current Elf's calories
+    const calories = parseInt(line);
+    elfCalories[currentElf] = (elfCalories[currentElf] || 0) + calories;
+  }
+}
 
 // Find the Elf with the most calories by finding the maximum value in the array
-const mostCalories = Math.max(...calories);
+const maxCalories = Math.max(...elfCalories);
 
-// Print the result
-console.log(mostCalories);
+// Print the result to the console
+console.log(`The Elf with the most calories is carrying ${maxCalories} calories.`);
 ```
-This solution reads the input file and parses it into an array of numbers. It then filters out any non-numeric values, and finds the maximum value in the array, which is the number of calories carried by the Elf with the most calories. Finally, it prints the result to the console.
 
-Note: This solution assumes that the input file is in the same directory as the TypeScript file, and that it is formatted as described in the problem statement (i.e. each Elf's inventory is separated by a blank line).
+## Prompt 
+Nice! You did pretty good, the answer was correct, but the read file API in Deno is different. Now for part 2. 
+--- Part Two ---
+By the time you calculate the answer to the Elves' question, they've already realized that the Elf carrying the most Calories of food might eventually run out of snacks.
+
+To avoid this unacceptable situation, the Elves would instead like to know the total Calories carried by the top three Elves carrying the most Calories. That way, even if one of those Elves runs out of snacks, they still have two backups.
+
+In the example above, the top three Elves are the fourth Elf (with 24000 Calories), then the third Elf (with 11000 Calories), then the fifth Elf (with 10000 Calories). The sum of the Calories carried by these three elves is 45000.
+
+Find the top three Elves carrying the most Calories. How many Calories are those Elves carrying in total?
+
+## Answer 
+To solve this part of the task, we will first use the solution we developed in part 1 to find the Elf with the most calories. Then, we will sort the array of Elf calories in descending order and take the first three values to find the total calories carried by the top three Elves.
+```typescript
+import { readFileStr } from "https://deno.land/std/fs/read_file_str.ts";
+
+// Read the input file and split it into an array of strings
+const input = await readFileStr("input.txt");
+const lines = input.split("\n");
+
+// Create an array to store the calories of each Elf
+const elfCalories = [];
+
+// Parse the calories for each Elf from the input strings
+let currentElf = 0;
+for (const line of lines) {
+  if (line === "") {
+    // If the line is empty, we have reached the next Elf
+    currentElf++;
+  } else {
+    // Parse the calorie value from the line and add it to the current Elf's calories
+    const calories = parseInt(line);
+    elfCalories[currentElf] = (elfCalories[currentElf] || 0) + calories;
+  }
+}
+
+// Sort the array of Elf calories in descending order
+elfCalories.sort((a, b) => b - a);
+
+// Find the total calories carried by the top three Elves
+const topThreeCalories = elfCalories.slice(0, 3).reduce((sum, calories) => sum + calories, 0);
+
+// Print the result to the console
+console.log(`The top three Elves are carrying ${topThreeCalories} calories in total.`);
+
+```
